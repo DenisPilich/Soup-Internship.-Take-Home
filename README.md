@@ -54,6 +54,19 @@ Errors: `401` missing, expired or revoked credential; `404` unknown **or
 foreign** resource with the same body; `422` invalid batch or query parameter;
 `413` batch over the limit.
 
+### Key rotation
+
+```bash
+curl -c cookies.txt -X POST http://localhost:3000/api/auth/session \
+  -H 'Content-Type: application/json' \
+  -d '{"api_key":"soup_demoa001_1f8c2b6e4a9d4f7c8b3e5a1d6f9c2b7e4a8d1f3c"}'
+
+curl -b cookies.txt -X POST http://localhost:3000/api/keys/rotate
+```
+
+The old key stops working immediately, and the session minted from it dies with
+it. The new raw key is returned once and never stored.
+
 ## Tests
 
 ```bash
@@ -63,6 +76,12 @@ cd e2e && npm install && npm test   # 2 Playwright tests (Chrome required)
 ```
 
 Raw output is committed in `docs/test-output/`.
+
+| Check | Result |
+|---|---|
+| Backend | 31 tests: ingestion, ordering, idempotency, isolation, rotation, SSE, cache, backpressure |
+| End-to-end | 2 Playwright scenarios, including a socket-level network cut |
+| Load | 15 000 events at 500 events/sec: 15 000 stored, p95 89 ms, 0 errors |
 
 Load test (500 events/sec target):
 
