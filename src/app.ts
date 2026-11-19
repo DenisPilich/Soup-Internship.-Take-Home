@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import express from 'express';
 import type { Express, NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
@@ -13,12 +15,6 @@ export function createApp(): Express {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json({ limit: '1mb' }));
-
-  app.get('/', (_req, res) => {
-    res
-      .type('html')
-      .send('<!doctype html><h1>Soup experiment tracker</h1><p>API is up. UI comes next.</p>');
-  });
 
   app.get('/healthz', (_req, res) => {
     res.json({ ok: true });
@@ -39,6 +35,20 @@ export function createApp(): Express {
   app.use('/api/runs', runsRouter);
   // The ingestion path is fixed by the assignment.
   app.use('/runs', ingestRouter);
+
+  // Built SPA, when present (the Docker image ships it). In development the
+  // Vite dev server serves the UI and proxies /api here.
+  const publicDir = path.resolve('public');
+  if (existsSync(publicDir)) {
+    app.use(express.static(publicDir, { index: false }));
+    app.use((req, res, next) => {
+      if (req.method !== 'GET' || req.path.startsWith('/api')) {
+        next();
+        return;
+      }
+      res.sendFile(path.join(publicDir, 'index.html'));
+    });
+  }
 
   app.use((_req, res) => {
     res.status(404).json({ error: 'not_found' });
