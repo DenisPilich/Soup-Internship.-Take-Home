@@ -6,7 +6,7 @@ export type MetricEvent = {
   ts: string;
 };
 
-export type StreamStatus = 'connecting' | 'live' | 'reconnecting' | 'expired';
+export type StreamStatus = 'connecting' | 'live' | 'reconnecting' | 'expired' | 'not_found';
 
 export type RunState = {
   events: MetricEvent[];
@@ -63,7 +63,7 @@ export class RunStore {
     this.setStatus('connecting');
 
     await this.loadFrom(0);
-    if (this.stopped || this.status === 'expired') return;
+    if (this.stopped || this.status === 'expired' || this.status === 'not_found') return;
 
     this.openStream();
     this.reconcileTimer = setInterval(() => {
@@ -112,6 +112,10 @@ export class RunStore {
 
       if (response.status === 401) {
         this.setStatus('expired');
+        return;
+      }
+      if (response.status === 404) {
+        this.setStatus('not_found');
         return;
       }
       if (!response.ok) {

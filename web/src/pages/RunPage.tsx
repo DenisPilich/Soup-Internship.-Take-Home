@@ -17,6 +17,7 @@ const STATUS_LABEL: Record<StreamStatus, string> = {
   live: 'live',
   reconnecting: 'reconnecting',
   expired: 'session expired',
+  not_found: 'not found',
 };
 
 export default function RunPage() {

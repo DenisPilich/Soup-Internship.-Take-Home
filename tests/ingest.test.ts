@@ -82,6 +82,23 @@ describe('ingestBatch', () => {
     expect(count.rows[0]!.n).toBe(0);
   });
 
+  it('rolls back the whole batch when one event violates a database constraint', async () => {
+    const good = event(1);
+    // 201 characters breaks the schema check on the metric name. The row would
+    // be valid on its own; only the batch-mate makes it fail.
+    const bad = { ...event(2), name: 'x'.repeat(201) };
+
+    await expect(
+      ingestBatch(testPool, { projectId, runId, events: [good, bad] }),
+    ).rejects.toThrow();
+
+    const count = await testPool.query<{ n: number }>(
+      'select count(*)::int as n from metric_events where run_id = $1',
+      [runId],
+    );
+    expect(count.rows[0]!.n).toBe(0);
+  });
+
   it('keeps seq gap-free when writers race', async () => {
     await Promise.all(
       Array.from({ length: 10 }, (_, index) =>
