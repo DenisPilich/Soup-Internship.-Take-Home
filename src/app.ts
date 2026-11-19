@@ -3,6 +3,11 @@ import type { Express, NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
 import { pool } from './db/pool.js';
 import { HttpError } from './errors.js';
+import { authRouter } from './routes/auth.js';
+import { ingestRouter } from './routes/ingest.js';
+import { keysRouter } from './routes/keys.js';
+import { runsRouter } from './routes/runs.js';
+import { streamRouter } from './routes/stream.js';
 
 export function createApp(): Express {
   const app = express();
@@ -28,7 +33,12 @@ export function createApp(): Express {
     }
   });
 
-  // Feature routes are mounted here as they are implemented.
+  app.use('/api/auth', authRouter);
+  app.use('/api/keys', keysRouter);
+  app.use('/api/runs', streamRouter);
+  app.use('/api/runs', runsRouter);
+  // The ingestion path is fixed by the assignment.
+  app.use('/runs', ingestRouter);
 
   app.use((_req, res) => {
     res.status(404).json({ error: 'not_found' });
@@ -43,10 +53,11 @@ export function createApp(): Express {
       res.status(422).json({ error: 'invalid_request' });
       return;
     }
-    // body-parser syntax errors carry a numeric status.
+    // body-parser errors (bad JSON, payload too large, bad content type) carry
+    // a numeric 4xx status.
     const status = (err as { status?: unknown } | null)?.status;
-    if (status === 400) {
-      res.status(400).json({ error: 'invalid_json' });
+    if (typeof status === 'number' && status >= 400 && status < 500) {
+      res.status(status).json({ error: 'invalid_request' });
       return;
     }
     console.error('[error]', err);

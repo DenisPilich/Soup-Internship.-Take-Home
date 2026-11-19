@@ -7,5 +7,10 @@ export default defineConfig({
     fileParallelism: false,
     testTimeout: 30_000,
     hookTimeout: 30_000,
+    env: {
+      NODE_ENV: 'test',
+      // Tests never touch the development database.
+      DATABASE_URL: 'postgres://soup:soup@localhost:5432/soup_test',
+    },
   },
 });

@@ -2,10 +2,12 @@ import { z } from 'zod';
 
 // Local development reads .env. In Docker (and in CI) the file is absent and
 // the variables come from the process environment, so a missing file is fine.
-try {
-  process.loadEnvFile();
-} catch {
-  // no .env file: nothing to load
+if (process.env.NODE_ENV !== 'test') {
+  try {
+    process.loadEnvFile();
+  } catch {
+    // no .env file: variables come from the process environment
+  }
 }
 
 const envSchema = z.object({
