@@ -17,6 +17,10 @@ function shutdown(signal: string): void {
   server.close(() => {
     void pool.end().finally(() => process.exit(0));
   });
+
+  // SSE connections never end on their own. Give in-flight requests a moment,
+  // then drop the remaining sockets so the container can actually stop.
+  setTimeout(() => server.closeAllConnections(), 3000).unref();
 }
 
 process.on('SIGINT', () => shutdown('SIGINT'));

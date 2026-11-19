@@ -15,6 +15,8 @@ docker compose up --build
 Open http://localhost:3000 and sign in with a demo key (development only, not
 secrets):
 
+Reset the demo at any time with `docker compose down -v` and start again.
+
 | Project | API key |
 |---|---|
 | Project A | `soup_demoa001_1f8c2b6e4a9d4f7c8b3e5a1d6f9c2b7e4a8d1f3c` |
@@ -47,6 +49,10 @@ short curve, so the page is not empty on the first visit.
 | GET | `/api/runs/{id}` | cookie | run metadata |
 | GET | `/api/runs/{id}/events?after_seq=` | cookie | snapshot / catch-up |
 | GET | `/api/runs/{id}/stream` | cookie | SSE, honours `Last-Event-ID` |
+
+Errors: `401` missing, expired or revoked credential; `404` unknown **or
+foreign** resource with the same body; `422` invalid batch or query parameter;
+`413` batch over the limit.
 
 ## Tests
 

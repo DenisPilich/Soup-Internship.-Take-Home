@@ -15,6 +15,11 @@ import { streamRouter } from './routes/stream.js';
 export function createApp(): Express {
   const app = express();
   app.disable('x-powered-by');
+  app.use((_req, res, next) => {
+    res.setHeader('x-content-type-options', 'nosniff');
+    res.setHeader('referrer-policy', 'no-referrer');
+    next();
+  });
   app.use(express.json({ limit: '1mb' }));
 
   if (config.NODE_ENV !== 'test') {

@@ -113,6 +113,7 @@ the SQL oracle could share a misunderstanding).
 | Lost events after reconnect | E2E cuts every socket, ingests while offline, reconnects | converged, no loss |
 | Duplicate batch | backend test + E2E resend | `accepted=0`, one row per event |
 | Out-of-order arrival | E2E sends seq 1,2 then 3 then a late event | displayed by `ts`, cursor by `seq` |
+| Late event (older timestamp) | E2E sends `ts = 5` after `ts = 30` | stored with the next `seq`, drawn at its timestamp |
 | Partial write | fault injection: one event violates a DB check | zero rows |
 | Old key after rotation | API test: old key and its session | 401, new key 200 |
 | Slow client / queue overflow | unit test: the writer waits for `drain`; no per-client queue exists | mechanism proven, kernel buffer not filled |
