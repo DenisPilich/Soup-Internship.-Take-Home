@@ -29,6 +29,10 @@ curl -X POST http://localhost:3000/runs/00000000-0000-4000-8000-0000000000c1/met
   -d '{"events":[{"event_id":"11111111-1111-4111-8111-111111111111","name":"loss","value":0.42,"ts":"2026-11-19T17:00:00Z"}]}'
 ```
 
+Watch it live: `node scripts/demo.mjs` sends one `loss` and one `accuracy`
+sample per second to the demo run. The seed already gives both demo runs a
+short curve, so the page is not empty on the first visit.
+
 ## API
 
 | Method | Path | Auth | Purpose |
@@ -48,7 +52,7 @@ curl -X POST http://localhost:3000/runs/00000000-0000-4000-8000-0000000000c1/met
 
 ```bash
 docker compose up -d db
-npm test                     # 25 backend tests, separate soup_test database
+npm test                     # 31 backend tests, separate soup_test database
 cd e2e && npm install && npm test   # 2 Playwright tests (Chrome required)
 ```
 
@@ -94,7 +98,6 @@ labs/           learning experiments, not part of the deliverable
 - [Design](docs/design.md) — event model, ordering, idempotency, catch-up, isolation.
 - [Engineering note](docs/note.md) — architecture, evidence, verdict, limitations.
 - [AI usage](docs/ai-usage.md) — where AI helped and what was rejected.
-- [Interview notes](docs/interview-notes.md) — the reasoning behind each decision.
 
 ## Known limitations
 

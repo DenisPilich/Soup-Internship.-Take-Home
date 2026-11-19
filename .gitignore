@@ -1,4 +1,4 @@
-﻿node_modules/
+node_modules/
 dist/
 coverage/
 .env
@@ -8,3 +8,5 @@ web/node_modules/
 web/dist/
 playwright-report/
 test-results/
+labs/
+docs/interview-notes.md

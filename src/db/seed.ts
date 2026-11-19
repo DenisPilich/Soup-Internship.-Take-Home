@@ -55,6 +55,28 @@ export async function seedDemoData(): Promise<void> {
       [project.runId, project.id, project.runName],
     );
 
+    // A ready-to-look-at demo: two curves over the last minute. Guarded so a
+    // restart never duplicates them, and so real ingestion is never touched.
+    await pool.query(
+      `insert into metric_events (run_id, seq, event_id, name, value, ts)
+       select $1, series.seq, gen_random_uuid(), series.name, series.value, series.ts
+       from (
+         select g.i * 2 - 1 as seq,
+                'loss' as name,
+                0.9 * exp(-g.i / 12.0) + 0.05 + ((g.i * 7) % 5) * 0.004 as value,
+                now() - (30 - g.i) * interval '2 seconds' as ts
+         from generate_series(1, 30) as g(i)
+         union all
+         select g.i * 2,
+                'accuracy',
+                0.55 + 0.35 * (1 - exp(-g.i / 12.0)) + ((g.i * 3) % 4) * 0.003,
+                now() - (30 - g.i) * interval '2 seconds'
+         from generate_series(1, 30) as g(i)
+       ) as series
+       where not exists (select 1 from metric_events where run_id = $1)`,
+      [project.runId],
+    );
+
     if (insertedProject.rowCount === 1) created += 1;
   }
 

@@ -14,7 +14,10 @@
     "seed": "tsx src/db/seed.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "demo": "node scripts/demo.mjs",
+    "load": "node scripts/load.mjs",
+    "e2e": "npm --prefix e2e test"
   },
   "dependencies": {
     "express": "^5.1.0",

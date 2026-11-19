@@ -86,9 +86,9 @@ side channel is not ruled out.
 
 ## 6. Test evidence
 
-- 25 backend tests (`npm test`): ingestion invariants, HTTP validation,
-  isolation, rotation, SSE replay and authorization. Raw output:
-  `docs/test-output/backend-tests.txt`.
+- 31 backend tests (`npm test`): ingestion invariants, HTTP validation,
+  isolation, rotation, SSE replay and authorization, cache isolation and
+  backpressure. Raw output: `docs/test-output/backend-tests.txt`.
 - 2 Playwright tests (`e2e/`): the consistency scenario (out-of-order, duplicate
   batch, late event, socket-level disconnect, reconnect) and a cross-project
   page access check. Raw output: `docs/test-output/e2e.txt`.
@@ -115,7 +115,7 @@ the SQL oracle could share a misunderstanding).
 | Out-of-order arrival | E2E sends seq 1,2 then 3 then a late event | displayed by `ts`, cursor by `seq` |
 | Partial write | fault injection: one event violates a DB check | zero rows |
 | Old key after rotation | API test: old key and its session | 401, new key 200 |
-| Slow client / queue overflow | not automated; backpressure by design, no per-client queue | known gap |
+| Slow client / queue overflow | unit test: the writer waits for `drain`; no per-client queue exists | mechanism proven, kernel buffer not filled |
 | Stale cache | invalidation test after create; TTL 2 s | new run visible immediately |
 | Unauthorized subscription / ingestion | tests against a foreign run | 404, no bytes, no rows |
 | Unauthorized read of a run list | test with two projects | only own runs |
@@ -169,7 +169,7 @@ between a cursor that means something and one that occasionally lies.
 The viewer side is not measured. I proved 500 events/sec into the database, but
 not what happens to fifty open streams when each connection polls every 300 ms —
 that is the first thing I would benchmark before calling this production-ready.
-I also do not have a test for a genuinely slow client: the design removes the
-per-client queue, but I verified that by reading the code, not by pushing a
-stalled socket until the buffer fills. And the E2E is one scenario; it is strong
-evidence, not a proof.
+I also do not have an end-to-end test for a genuinely slow client: the writer's
+backpressure is unit-tested, but I never pushed a stalled socket until the
+kernel buffer filled, so real-socket behaviour is reasoned about, not measured.
+And the E2E is one scenario; it is strong evidence, not a proof.

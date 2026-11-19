@@ -4,6 +4,7 @@ import { UnauthorizedError, api } from '../api';
 import Chart from '../components/Chart';
 import { RunStore } from '../runStore';
 import type { MetricEvent, StreamStatus } from '../runStore';
+import { formatNumber } from '../format';
 
 type Run = {
   id: string;
@@ -142,7 +143,7 @@ export default function RunPage() {
               <tr key={event.seq}>
                 <td>{event.seq}</td>
                 <td>{event.name}</td>
-                <td>{event.value}</td>
+                <td>{formatNumber(event.value)}</td>
                 <td>{new Date(event.ts).toISOString()}</td>
               </tr>
             ))}

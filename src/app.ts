@@ -3,6 +3,7 @@ import path from 'node:path';
 import express from 'express';
 import type { Express, NextFunction, Request, Response } from 'express';
 import { ZodError } from 'zod';
+import { config } from './config.js';
 import { pool } from './db/pool.js';
 import { HttpError } from './errors.js';
 import { authRouter } from './routes/auth.js';
@@ -15,6 +16,19 @@ export function createApp(): Express {
   const app = express();
   app.disable('x-powered-by');
   app.use(express.json({ limit: '1mb' }));
+
+  if (config.NODE_ENV !== 'test') {
+    // Method, path, status, duration. No headers, no bodies, no query string:
+    // there is nothing secret to leak into the logs.
+    app.use((req, res, next) => {
+      const startedAt = performance.now();
+      res.on('finish', () => {
+        const duration = Math.round(performance.now() - startedAt);
+        console.log(`[api] ${req.method} ${req.path} ${res.statusCode} ${duration}ms`);
+      });
+      next();
+    });
+  }
 
   app.get('/healthz', (_req, res) => {
     res.json({ ok: true });

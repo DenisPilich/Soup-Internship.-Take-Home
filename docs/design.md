@@ -1,6 +1,6 @@
 # Design — Mini Experiment Tracker
 
-**Status:** draft v1, 2026-11-19. Locked decisions: SSE, database-as-log, in-process cache.
+**Status:** v1, 2026-11-19. Locked decisions: SSE, database-as-log, in-process cache.
 
 ## 1. Scope
 

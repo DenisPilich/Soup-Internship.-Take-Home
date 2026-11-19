@@ -1,4 +1,4 @@
-﻿import { Router } from 'express';
+import { Router } from 'express';
 import type { Response } from 'express';
 import { pool } from '../db/pool.js';
 import { NotFoundError } from '../errors.js';
@@ -40,7 +40,7 @@ function delay(ms: number): Promise<void> {
  * This is the backpressure boundary: a slow client makes the loop wait, so the
  * server never accumulates an unbounded per-client queue.
  */
-function write(res: Response, chunk: string): Promise<void> {
+export function writeChunk(res: Response, chunk: string): Promise<void> {
   return new Promise((resolve) => {
     if (res.writableEnded || res.destroyed) {
       resolve();
@@ -108,7 +108,7 @@ streamRouter.get('/:runId/stream', requireSession, async (req, res) => {
       );
 
       for (const row of result.rows) {
-        await write(res, frame(row));
+        await writeChunk(res, frame(row));
         cursor = Number(row.seq);
         if (closed) break;
       }
@@ -119,7 +119,7 @@ streamRouter.get('/:runId/stream', requireSession, async (req, res) => {
       if (result.rowCount === BATCH) continue;
 
       if (Date.now() - lastPing >= HEARTBEAT_MS) {
-        await write(res, ': ping\n\n');
+        await writeChunk(res, ': ping\n\n');
         lastPing = Date.now();
       }
 
