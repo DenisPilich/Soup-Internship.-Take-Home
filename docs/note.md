@@ -80,7 +80,9 @@ API keys are stored as `sha256(secret)` with a plaintext lookup prefix; sessions
 store only `sha256(token)` and are bound to the key that minted them. Rotation
 revokes every active key and, through a join on `api_keys.revoked_at`, every
 session minted from it. Logs never contain keys, tokens or session ids; error
-bodies never echo resource data.
+bodies never echo resource data. Foreign and missing ids take the same query
+path and return the same body; no statistical timing test was run, so a timing
+side channel is not ruled out.
 
 ## 6. Test evidence
 
