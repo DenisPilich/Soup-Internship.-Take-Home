@@ -1,11 +1,12 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { Pool } from 'pg';
 import { pool } from './pool.js';
 
-export async function migrate(): Promise<void> {
+export async function migrate(target: Pool = pool): Promise<void> {
   const schema = readFileSync(new URL('./schema.sql', import.meta.url), 'utf8');
-  const client = await pool.connect();
+  const client = await target.connect();
   try {
     await client.query('BEGIN');
     await client.query(schema);
