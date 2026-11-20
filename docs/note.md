@@ -92,6 +92,10 @@ side channel is not ruled out.
 - 2 Playwright tests (`e2e/`): the consistency scenario (out-of-order, duplicate
   batch, late event, socket-level disconnect, reconnect) and a cross-project
   page access check. Raw output: `docs/test-output/e2e.txt`.
+- The frontend was scanned with Google's Modern Web Guidance 1.0, which applies
+  deterministic legacy-pattern rules. One finding (`sort` on a copied array) was
+  checked against the Keep/Drop criteria and replaced with `toSorted()`; see
+  `docs/modern-web-audit.md`.
 - The E2E compares three things: the page's rendered attributes, the client's
   applied event set (`window.__getRunState`), and a projection computed directly
   from SQL. The DB is the oracle; the API's own view is not trusted.

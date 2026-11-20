@@ -113,9 +113,8 @@ src/db/         pool, schema.sql, migrate, demo seed
 tests/          Vitest: ingestion, HTTP, isolation, SSE
 web/            React SPA (run list, live run page, client-side fold)
 e2e/            Playwright: consistency under a real socket cut
-scripts/        load test
-docs/           design.md, note.md, ai-usage.md, interview-notes.md, raw output
-labs/           learning experiments, not part of the deliverable
+scripts/        load test and live demo
+docs/           design.md, note.md, ai-usage.md, modern-web-audit.md, raw output
 ```
 
 ## Documents
@@ -123,6 +122,8 @@ labs/           learning experiments, not part of the deliverable
 - [Design](docs/design.md) — event model, ordering, idempotency, catch-up, isolation.
 - [Engineering note](docs/note.md) — architecture, evidence, verdict, limitations.
 - [AI usage](docs/ai-usage.md) — where AI helped and what was rejected.
+- [Modern web audit](docs/modern-web-audit.md) — the Chrome/Edge/Firefox/MDN
+  scanner finding and the one change it produced.
 
 ## Known limitations
 

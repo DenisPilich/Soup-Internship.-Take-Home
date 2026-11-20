@@ -81,7 +81,7 @@ export default function RunPage() {
   }, [state.events]);
 
   const recent = useMemo(
-    () => [...state.events].sort((a, b) => b.seq - a.seq).slice(0, 15),
+    () => state.events.toSorted((a, b) => b.seq - a.seq).slice(0, 15),
     [state.events],
   );
 

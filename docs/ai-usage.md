@@ -23,6 +23,7 @@ It is deliberately not a claim that I typed the code myself.
 | 404 for foreign and missing resources | 403 | 403 confirms existence; 404 makes the API useless as an ID oracle. |
 | Keep the small run-list cache | No cache | The assignment explicitly asks to prove cache isolation; the cache is 40 lines and its failure mode is testable. |
 | Keep the known gaps in the note | Hide them | A clear negative result is better than a hidden failure. |
+| Run the Modern Web Guidance audit | Skip it | One deterministic finding, cheap to verify; evidence, not a badge. |
 
 ## What was verified
 
@@ -36,6 +37,8 @@ It is deliberately not a claim that I typed the code myself.
   500 events/sec, zero errors. Raw output in `docs/test-output/load.txt`.
 - A second load run with `BATCH=1` to separate request overhead from write
   throughput (`docs/test-output/load-batch1.txt`).
+- Modern Web Guidance 1.0 scanned the frontend; its single finding was verified
+  and applied (`docs/modern-web-audit.md`).
 
 ## What the AI got wrong
 
