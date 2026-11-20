@@ -50,10 +50,9 @@ export default function RunListPage() {
     <Shell>
       <header className="page-head">
         <div>
+          <p className="eyebrow">// workspace</p>
           <h1>Runs</h1>
-          <p className="page-sub">
-            {runs.length} {runs.length === 1 ? 'run' : 'runs'} in this project
-          </p>
+          <p className="page-sub">&gt; {runs.length} runs in this project</p>
         </div>
 
         <form className="new-run" onSubmit={createRun}>
@@ -97,16 +96,13 @@ export default function RunListPage() {
                       {run.status}
                     </span>
                   </td>
-                  <td
-                    className="muted"
-                    title={new Date(run.created_at).toLocaleString()}
-                  >
+                  <td className="muted" title={new Date(run.created_at).toLocaleString()}>
                     {formatRelative(run.created_at)}
                   </td>
                   <td className="mono dim">{run.id.slice(0, 8)}</td>
                   <td className="cell-action">
                     <Link to={`/runs/${run.id}`} className="row-open">
-                      Open
+                      open
                     </Link>
                   </td>
                 </tr>
@@ -114,9 +110,9 @@ export default function RunListPage() {
             </tbody>
           </table>
 
-          {loading && <div className="empty-card">Loading…</div>}
+          {loading && <div className="empty-card">loading...</div>}
           {!loading && runs.length === 0 && (
-            <div className="empty-card">No runs yet. Create the first one above.</div>
+            <div className="empty-card">no runs yet. create the first one above.</div>
           )}
         </div>
       </section>

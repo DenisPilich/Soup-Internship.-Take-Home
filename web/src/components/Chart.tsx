@@ -35,12 +35,13 @@ export default function Chart({ name, points, color }: Props) {
   );
   const last = points[points.length - 1]!;
   const levels = [minV, minV + spanV / 2, maxV];
+  const glow = { filter: `drop-shadow(0 0 4px ${color})` };
 
   return (
     <article className="chart panel">
       <header className="chart-head">
         <div className="chart-title">
-          <i style={{ background: color }} />
+          <i style={{ background: color, boxShadow: `0 0 8px ${color}` }} />
           {name}
         </div>
         <span className="chart-last">{formatNumber(last.value)}</span>
@@ -62,20 +63,20 @@ export default function Chart({ name, points, color }: Props) {
           </g>
         ))}
 
-        <polyline points={coords.join(' ')} className="line" stroke={color} />
+        <polyline points={coords.join(' ')} className="line" stroke={color} style={glow} />
 
         {points.map((point, index) => (
           <circle
             key={point.seq}
             cx={x(times[index]!)}
             cy={y(point.value)}
-            r="2.2"
-            fill="#ffffff"
+            r="2.1"
+            fill="#050308"
             stroke={color}
-            strokeWidth="1.4"
+            strokeWidth="1.3"
           />
         ))}
-        <circle cx={x(maxT)} cy={y(last.value)} r="3.6" fill={color} />
+        <circle cx={x(maxT)} cy={y(last.value)} r="3.6" fill={color} style={glow} />
 
         <text x={PAD_LEFT} y={HEIGHT - 8} className="tick">
           {formatClock(points[0]!.ts)}

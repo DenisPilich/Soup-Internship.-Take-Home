@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { UnauthorizedError, api } from '../api';
 import Chart from '../components/Chart';
@@ -24,7 +24,7 @@ const STATUS_LABEL: Record<StreamStatus, string> = {
   not_found: 'not found',
 };
 
-const PALETTE = ['#1a73e8', '#188038', '#9334e6', '#e8710a', '#d01884'];
+const PALETTE = ['#c15cff', '#86f5c8', '#5ef2ff', '#ff5fd2', '#ffc857'];
 
 export default function RunPage() {
   const { runId = '' } = useParams();
@@ -116,8 +116,18 @@ export default function RunPage() {
     });
   }
 
+  const status = (
+    <>
+      <span className="status-item">events:{state.events.length}</span>
+      <span className="status-item">cursor:{state.cursor}</span>
+      <span className="status-item">
+        <i className={`dot ${state.status}`} /> {STATUS_LABEL[state.status]}
+      </span>
+    </>
+  );
+
   return (
-    <Shell activeRunId={runId}>
+    <Shell activeRunId={runId} status={status}>
       <main
         className="run-page"
         data-run-id={runId}
@@ -127,8 +137,11 @@ export default function RunPage() {
       >
         <header className="page-head">
           <div>
+            <p className="eyebrow">// run</p>
             <div className="breadcrumb">
-              <Link to="/">Runs</Link>
+              <span>~</span>
+              <span>/</span>
+              <Link to="/">runs</Link>
               <span>/</span>
               <span>{run?.name ?? 'run'}</span>
             </div>
@@ -159,10 +172,10 @@ export default function RunPage() {
         <div className="run-layout">
           <aside className="run-controls panel">
             <div className="control-section">
-              <span className="control-label">Run details</span>
+              <span className="control-label"># run.info</span>
               <dl className="kv">
                 <div>
-                  <dt>Status</dt>
+                  <dt>status</dt>
                   <dd>
                     <span className={`status ${state.status}`}>
                       <i className="dot" />
@@ -171,26 +184,28 @@ export default function RunPage() {
                   </dd>
                 </div>
                 <div>
-                  <dt>Created</dt>
-                  <dd>{run ? formatRelative(run.created_at) : 'вЂ”'}</dd>
+                  <dt>created</dt>
+                  <dd>{run ? formatRelative(run.created_at) : '-'}</dd>
                 </div>
                 <div>
-                  <dt>Run ID</dt>
-                  <dd className="mono run-id" title={runId}>{runId.slice(0, 8)}</dd>
+                  <dt>run_id</dt>
+                  <dd className="mono run-id" title={runId}>
+                    {runId.slice(0, 8)}
+                  </dd>
                 </div>
                 <div>
-                  <dt>Events</dt>
+                  <dt>events</dt>
                   <dd className="mono">{state.events.length}</dd>
                 </div>
                 <div>
-                  <dt>Cursor</dt>
+                  <dt>cursor</dt>
                   <dd className="mono">{state.cursor}</dd>
                 </div>
               </dl>
             </div>
 
             <div className="control-section">
-              <span className="control-label">Metrics</span>
+              <span className="control-label"># metrics</span>
               <div className="metric-toggles">
                 {[...series.keys()].map((name) => (
                   <label key={name} className="metric-toggle">
@@ -221,7 +236,7 @@ export default function RunPage() {
                 ))}
                 {visibleSeries.length === 0 && (
                   <div className="empty-card panel">
-                    {series.size === 0 ? 'Waiting for metricsвЂ¦' : 'All metrics are hidden.'}
+                    {series.size === 0 ? 'waiting for metrics...' : 'all metrics hidden'}
                   </div>
                 )}
               </section>
@@ -230,7 +245,7 @@ export default function RunPage() {
             {tab !== 'metrics' && (
               <section className="panel">
                 <header className="panel-head">
-                  <h2>Recent events</h2>
+                  <h2># recent events</h2>
                   <span className="muted small">latest 20 by seq</span>
                 </header>
 
@@ -238,10 +253,10 @@ export default function RunPage() {
                   <table className="data-table">
                     <thead>
                       <tr>
-                        <th>Seq</th>
-                        <th>Name</th>
-                        <th>Value</th>
-                        <th>Timestamp</th>
+                        <th>seq</th>
+                        <th>name</th>
+                        <th>value</th>
+                        <th>timestamp</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -256,7 +271,7 @@ export default function RunPage() {
                       {recent.length === 0 && (
                         <tr>
                           <td colSpan={4} className="muted">
-                            No events yet.
+                            no events yet
                           </td>
                         </tr>
                       )}

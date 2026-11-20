@@ -22,7 +22,7 @@ export default function LoginPage() {
       });
       navigate('/');
     } catch {
-      setError('That key was not accepted.');
+      setError('key rejected');
     } finally {
       setBusy(false);
     }
@@ -31,50 +31,53 @@ export default function LoginPage() {
   return (
     <main className="login">
       <section className="login-card">
-        <div className="login-brand">
-          <span className="login-logo">
-            soup<span>.</span>
-          </span>
-          <span className="login-sub">experiment tracker</span>
+        <header className="login-bar">
+          <span className="dot live" />
+          soup — login
+          <span className="login-bar-spacer" />
+          <span>tty1</span>
+        </header>
+
+        <div className="login-body">
+          <div className="login-brand">
+            <span className="login-logo">soup</span>
+            <span className="login-sub">// experiment tracker</span>
+          </div>
+
+          <p className="login-prompt">$ soup auth --key</p>
+
+          <form onSubmit={submit} className="login-form">
+            <label htmlFor="api-key">API key</label>
+            <input
+              id="api-key"
+              value={key}
+              onChange={(event) => setKey(event.target.value)}
+              placeholder="soup_xxxxxxxx_..."
+              autoComplete="off"
+              spellCheck={false}
+              autoFocus
+            />
+            <button className="primary" type="submit" disabled={busy}>
+              {busy ? 'Signing in…' : 'Sign in'}
+            </button>
+            {error && <p className="notice error">{error}</p>}
+          </form>
+
+          <details className="demo-keys">
+            <summary>demo keys (development only)</summary>
+            <p>
+              <strong>Project A</strong>
+              <code>soup_demoa001_1f8c2b6e4a9d4f7c8b3e5a1d6f9c2b7e4a8d1f3c</code>
+            </p>
+            <p>
+              <strong>Project B</strong>
+              <code>soup_demob002_7c4e1a9f3b6d2e8a5c1f7b4d9e2a6c3f8b5d1e7a</code>
+            </p>
+          </details>
         </div>
-
-        <h1>Sign in</h1>
-        <p className="login-hint">
-          Use a project API key. It is exchanged for an HttpOnly session cookie and never stored
-          in the browser.
-        </p>
-
-        <form onSubmit={submit} className="login-form">
-          <label htmlFor="api-key">API key</label>
-          <input
-            id="api-key"
-            value={key}
-            onChange={(event) => setKey(event.target.value)}
-            placeholder="soup_xxxxxxxx_..."
-            autoComplete="off"
-            spellCheck={false}
-            autoFocus
-          />
-          <button className="primary" type="submit" disabled={busy}>
-            {busy ? 'Signing in…' : 'Sign in'}
-          </button>
-          {error && <p className="notice error">{error}</p>}
-        </form>
-
-        <details className="demo-keys">
-          <summary>Demo keys (development only)</summary>
-          <p>
-            <strong>Project A</strong>
-            <code>soup_demoa001_1f8c2b6e4a9d4f7c8b3e5a1d6f9c2b7e4a8d1f3c</code>
-          </p>
-          <p>
-            <strong>Project B</strong>
-            <code>soup_demob002_7c4e1a9f3b6d2e8a5c1f7b4d9e2a6c3f8b5d1e7a</code>
-          </p>
-        </details>
       </section>
 
-      <p className="login-foot">Postgres as the source of truth · SSE tail · per-project isolation</p>
+      <p className="login-foot">postgres · sse tail · per-project isolation</p>
     </main>
   );
 }

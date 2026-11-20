@@ -13,7 +13,30 @@ type Run = {
   created_at: string;
 };
 
-export function Shell({ children, activeRunId }: { children: ReactNode; activeRunId?: string }) {
+function Clock() {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <span className="status-item status-time">
+      {now.toLocaleTimeString([], { hour12: false })}
+    </span>
+  );
+}
+
+export function Shell({
+  children,
+  activeRunId,
+  status,
+}: {
+  children: ReactNode;
+  activeRunId?: string;
+  status?: ReactNode;
+}) {
   const navigate = useNavigate();
   const [project, setProject] = useState<Project | null>(null);
   const [runs, setRuns] = useState<Run[]>([]);
@@ -56,19 +79,21 @@ export function Shell({ children, activeRunId }: { children: ReactNode; activeRu
     <div className="app">
       <header className="topbar">
         <Link to="/" className="brand">
-          soup<span className="brand-dot">.</span>
+          <span className="brand-name">soup</span>
+          <span className="brand-slash">//</span>
+          <span className="brand-sub">tracker</span>
         </Link>
 
         <nav className="topnav">
           <NavLink to="/" end className={({ isActive }) => `topnav-link${isActive ? ' active' : ''}`}>
-            Runs
+            [ runs ]
           </NavLink>
         </nav>
 
         <div className="topbar-right">
-          {project && <span className="topbar-project">{project.name}</span>}
+          {project && <span className="topbar-project">[{project.name}]</span>}
           <button className="topbar-button" onClick={signOut}>
-            Sign out
+            [ sign out ]
           </button>
         </div>
       </header>
@@ -76,13 +101,13 @@ export function Shell({ children, activeRunId }: { children: ReactNode; activeRu
       <div className="app-body">
         <aside className="sidebar">
           <div className="sidebar-head">
-            <span className="side-title">Runs</span>
+            <span className="side-title"># runs</span>
             <span className="side-count">{runs.length}</span>
           </div>
 
           <input
             className="side-search"
-            placeholder="Search runs"
+            placeholder="filter..."
             aria-label="Search runs"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -95,6 +120,7 @@ export function Shell({ children, activeRunId }: { children: ReactNode; activeRu
                   to={`/runs/${run.id}`}
                   className={`side-run${activeRunId === run.id ? ' active' : ''}`}
                 >
+                  <span className="side-prompt">&gt;</span>
                   <i className={`dot ${run.status}`} />
                   <span className="side-run-name">{run.name}</span>
                   <span className="side-run-time">{formatRelative(run.created_at)}</span>
@@ -103,11 +129,21 @@ export function Shell({ children, activeRunId }: { children: ReactNode; activeRu
             ))}
           </ul>
 
-          {ready && runs.length === 0 && <p className="side-empty">No runs yet.</p>}
+          {ready && runs.length === 0 && <p className="side-empty">no runs yet</p>}
         </aside>
 
         <div className="content">{children}</div>
       </div>
+
+      <footer className="statusbar">
+        <span className="status-item">
+          <i className="dot live" /> {project?.name ?? '...'}
+        </span>
+        <span className="status-item">runs:{runs.length}</span>
+        {status}
+        <span className="status-spacer" />
+        <Clock />
+      </footer>
     </div>
   );
 }
