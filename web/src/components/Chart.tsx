@@ -1,4 +1,3 @@
-import { useId } from 'react';
 import type { MetricEvent } from '../runStore';
 import { formatClock, formatNumber } from '../format';
 
@@ -9,15 +8,13 @@ type Props = {
 };
 
 const WIDTH = 640;
-const HEIGHT = 210;
-const PAD_LEFT = 56;
+const HEIGHT = 220;
+const PAD_LEFT = 54;
 const PAD_RIGHT = 18;
-const PAD_TOP = 14;
-const PAD_BOTTOM = 34;
+const PAD_TOP = 16;
+const PAD_BOTTOM = 32;
 
 export default function Chart({ name, points, color }: Props) {
-  const gradientId = `chart-${useId().replace(/[^a-zA-Z0-9_-]/g, '')}`;
-
   const times = points.map((point) => Date.parse(point.ts));
   const values = points.map((point) => point.value);
 
@@ -50,13 +47,6 @@ export default function Chart({ name, points, color }: Props) {
       </header>
 
       <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="img" aria-label={`${name} series`}>
-        <defs>
-          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity="0.26" />
-            <stop offset="100%" stopColor={color} stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
         {levels.map((value, index) => (
           <g key={index}>
             <line
@@ -72,20 +62,20 @@ export default function Chart({ name, points, color }: Props) {
           </g>
         ))}
 
-        {points.length > 1 && (
-          <>
-            <polygon
-              points={`${x(minT).toFixed(1)},${HEIGHT - PAD_BOTTOM} ${coords.join(' ')} ${x(
-                maxT,
-              ).toFixed(1)},${HEIGHT - PAD_BOTTOM}`}
-              fill={`url(#${gradientId})`}
-            />
-            <polyline points={coords.join(' ')} className="line" stroke={color} />
-          </>
-        )}
+        <polyline points={coords.join(' ')} className="line" stroke={color} />
 
-        <circle cx={x(maxT)} cy={y(last.value)} r="3.5" fill={color} />
-        <circle cx={x(maxT)} cy={y(last.value)} r="7" fill={color} opacity="0.18" />
+        {points.map((point, index) => (
+          <circle
+            key={point.seq}
+            cx={x(times[index]!)}
+            cy={y(point.value)}
+            r="2.2"
+            fill="#ffffff"
+            stroke={color}
+            strokeWidth="1.4"
+          />
+        ))}
+        <circle cx={x(maxT)} cy={y(last.value)} r="3.6" fill={color} />
 
         <text x={PAD_LEFT} y={HEIGHT - 8} className="tick">
           {formatClock(points[0]!.ts)}

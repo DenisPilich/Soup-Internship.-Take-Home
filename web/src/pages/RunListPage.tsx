@@ -50,8 +50,10 @@ export default function RunListPage() {
     <Shell>
       <header className="page-head">
         <div>
-          <p className="eyebrow">Workspace</p>
           <h1>Runs</h1>
+          <p className="page-sub">
+            {runs.length} {runs.length === 1 ? 'run' : 'runs'} in this project
+          </p>
         </div>
 
         <form className="new-run" onSubmit={createRun}>
@@ -70,19 +72,14 @@ export default function RunListPage() {
       {error && <p className="notice error">{error}</p>}
 
       <section className="panel">
-        <header className="panel-head">
-          <h2>All runs</h2>
-          <span className="muted small">{runs.length} total</span>
-        </header>
-
         <div className="table-scroll">
           <table className="data-table runs-table">
             <thead>
               <tr>
-                <th>Run</th>
+                <th>Run name</th>
                 <th>Status</th>
                 <th>Created</th>
-                <th>ID</th>
+                <th>Run ID</th>
                 <th aria-label="open" />
               </tr>
             </thead>
@@ -101,7 +98,7 @@ export default function RunListPage() {
                     </span>
                   </td>
                   <td
-                    className="mono muted"
+                    className="muted"
                     title={new Date(run.created_at).toLocaleString()}
                   >
                     {formatRelative(run.created_at)}
@@ -109,7 +106,7 @@ export default function RunListPage() {
                   <td className="mono dim">{run.id.slice(0, 8)}</td>
                   <td className="cell-action">
                     <Link to={`/runs/${run.id}`} className="row-open">
-                      Open →
+                      Open
                     </Link>
                   </td>
                 </tr>

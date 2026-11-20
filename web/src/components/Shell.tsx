@@ -1,50 +1,51 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { UnauthorizedError, api } from '../api';
+import { formatRelative } from '../format';
 
 type Project = { id: string; name: string };
 
-function RunsIcon() {
-  return (
-    <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6">
-      <rect x="3" y="3" width="6" height="6" rx="1.5" />
-      <rect x="11" y="3" width="6" height="6" rx="1.5" />
-      <rect x="3" y="11" width="6" height="6" rx="1.5" />
-      <rect x="11" y="11" width="6" height="6" rx="1.5" />
-    </svg>
-  );
-}
+type Run = {
+  id: string;
+  name: string;
+  status: string;
+  created_at: string;
+};
 
-function LogoutIcon() {
-  return (
-    <svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6">
-      <path d="M8 3H4v14h4" />
-      <path d="M12 6l4 4-4 4" />
-      <path d="M16 10H8" />
-    </svg>
-  );
-}
-
-export function Shell({ children, aside }: { children: ReactNode; aside?: ReactNode }) {
+export function Shell({ children, activeRunId }: { children: ReactNode; activeRunId?: string }) {
   const navigate = useNavigate();
   const [project, setProject] = useState<Project | null>(null);
+  const [runs, setRuns] = useState<Run[]>([]);
+  const [query, setQuery] = useState('');
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
-    api<{ project: Project }>('/api/auth/me')
-      .then((body) => {
-        if (!cancelled) setProject(body.project);
+    Promise.all([api<{ project: Project }>('/api/auth/me'), api<{ runs: Run[] }>('/api/runs')])
+      .then(([me, list]) => {
+        if (cancelled) return;
+        setProject(me.project);
+        setRuns(list.runs);
       })
       .catch((error: unknown) => {
         if (!cancelled && error instanceof UnauthorizedError) navigate('/login');
+      })
+      .finally(() => {
+        if (!cancelled) setReady(true);
       });
 
     return () => {
       cancelled = true;
     };
   }, [navigate]);
+
+  const filtered = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    if (!needle) return runs;
+    return runs.filter((run) => run.name.toLowerCase().includes(needle));
+  }, [runs, query]);
 
   async function signOut() {
     await api('/api/auth/session', { method: 'DELETE' }).catch(() => undefined);
@@ -53,52 +54,60 @@ export function Shell({ children, aside }: { children: ReactNode; aside?: ReactN
 
   return (
     <div className="app">
-      <aside className="rail">
-        <div className="rail-logo" aria-hidden="true">
-          S
-        </div>
-        <NavLink
-          to="/"
-          end
-          className={({ isActive }) => `rail-link${isActive ? ' active' : ''}`}
-          aria-label="Runs"
-          title="Runs"
-        >
-          <RunsIcon />
-        </NavLink>
-        <button className="rail-link rail-bottom" onClick={signOut} aria-label="Sign out" title="Sign out">
-          <LogoutIcon />
-        </button>
-      </aside>
+      <header className="topbar">
+        <Link to="/" className="brand">
+          soup<span className="brand-dot">.</span>
+        </Link>
 
-      <aside className="sidebar">
-        <div className="brand">
-          <span className="brand-mark">soup</span>
-          <span className="brand-sub">experiment tracker</span>
-        </div>
-
-        <div className="project">
-          <span className="eyebrow">Project</span>
-          <span className="project-name">{project?.name ?? '—'}</span>
-        </div>
-
-        <nav className="side-nav">
-          <NavLink to="/" end className={({ isActive }) => `side-link${isActive ? ' active' : ''}`}>
-            <span className="side-dot" />
+        <nav className="topnav">
+          <NavLink to="/" end className={({ isActive }) => `topnav-link${isActive ? ' active' : ''}`}>
             Runs
           </NavLink>
         </nav>
 
-        {aside && <div className="side-extra">{aside}</div>}
-
-        <div className="side-footer">
-          <button className="ghost-button" onClick={signOut}>
+        <div className="topbar-right">
+          {project && <span className="topbar-project">{project.name}</span>}
+          <button className="topbar-button" onClick={signOut}>
             Sign out
           </button>
         </div>
-      </aside>
+      </header>
 
-      <div className="content">{children}</div>
+      <div className="app-body">
+        <aside className="sidebar">
+          <div className="sidebar-head">
+            <span className="side-title">Runs</span>
+            <span className="side-count">{runs.length}</span>
+          </div>
+
+          <input
+            className="side-search"
+            placeholder="Search runs"
+            aria-label="Search runs"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+
+          <ul className="side-runs">
+            {filtered.map((run) => (
+              <li key={run.id}>
+                <Link
+                  to={`/runs/${run.id}`}
+                  className={`side-run${activeRunId === run.id ? ' active' : ''}`}
+                >
+                  <i className={`dot ${run.status}`} />
+                  <span className="side-run-name">{run.name}</span>
+                  <span className="side-run-time">{formatRelative(run.created_at)}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {ready && runs.length === 0 && <p className="side-empty">No runs yet.</p>}
+        </aside>
+
+        <div className="content">{children}</div>
+      </div>
     </div>
   );
 }

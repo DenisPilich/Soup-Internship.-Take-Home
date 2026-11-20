@@ -32,12 +32,14 @@ export default function LoginPage() {
     <main className="login">
       <section className="login-card">
         <div className="login-brand">
-          <span className="brand-mark">soup</span>
-          <span className="brand-sub">experiment tracker</span>
+          <span className="login-logo">
+            soup<span>.</span>
+          </span>
+          <span className="login-sub">experiment tracker</span>
         </div>
 
         <h1>Sign in</h1>
-        <p className="muted">
+        <p className="login-hint">
           Use a project API key. It is exchanged for an HttpOnly session cookie and never stored
           in the browser.
         </p>

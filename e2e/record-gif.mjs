@@ -10,9 +10,9 @@ const { PNG } = pngjs;
 const API = process.env.API_URL ?? 'http://127.0.0.1:3000';
 const KEY = 'soup_demoa001_1f8c2b6e4a9d4f7c8b3e5a1d6f9c2b7e4a8d1f3c';
 
-const VIEWPORT = { width: 1280, height: 820 };
-const CLIP = { x: 0, y: 0, width: 1280, height: 790 };
-const TARGET_WIDTH = 960;
+const VIEWPORT = { width: 1440, height: 900 };
+const CLIP = { x: 0, y: 0, width: 1440, height: 900 };
+const TARGET_WIDTH = 1000;
 const FRAMES = 26;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

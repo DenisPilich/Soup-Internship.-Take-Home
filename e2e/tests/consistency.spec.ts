@@ -68,7 +68,7 @@ async function login(page: Page, apiKey: string): Promise<void> {
 async function createRun(page: Page, name: string): Promise<string> {
   await page.getByLabel('new run name').fill(name);
   await page.getByRole('button', { name: 'Create run' }).click();
-  await page.getByRole('link', { name: new RegExp(name) }).click();
+  await page.locator('.runs-table').getByRole('link', { name: new RegExp(name) }).click();
 
   const main = page.locator('main[data-run-id]');
   await expect(main).toBeVisible();
