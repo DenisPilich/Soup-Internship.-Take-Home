@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UnauthorizedError, api } from '../api';
+import { Shell } from '../components/Shell';
+import { formatRelative } from '../format';
 
 type Run = {
   id: string;
@@ -10,11 +12,8 @@ type Run = {
   created_at: string;
 };
 
-type Project = { id: string; name: string };
-
 export default function RunListPage() {
   const navigate = useNavigate();
-  const [project, setProject] = useState<Project | null>(null);
   const [runs, setRuns] = useState<Run[]>([]);
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -22,11 +21,7 @@ export default function RunListPage() {
 
   async function load() {
     try {
-      const [me, list] = await Promise.all([
-        api<{ project: Project }>('/api/auth/me'),
-        api<{ runs: Run[] }>('/api/runs'),
-      ]);
-      setProject(me.project);
+      const list = await api<{ runs: Run[] }>('/api/runs');
       setRuns(list.runs);
       setError(null);
     } catch (err) {
@@ -51,51 +46,83 @@ export default function RunListPage() {
     await load();
   }
 
-  async function logout() {
-    await api('/api/auth/session', { method: 'DELETE' });
-    navigate('/login');
-  }
-
   return (
-    <main className="page">
-      <header className="topbar">
+    <Shell>
+      <header className="page-head">
         <div>
+          <p className="eyebrow">Workspace</p>
           <h1>Runs</h1>
-          {project && <p className="muted">{project.name}</p>}
         </div>
-        <button className="ghost" onClick={logout}>
-          Sign out
-        </button>
+
+        <form className="new-run" onSubmit={createRun}>
+          <input
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            placeholder="new run name"
+            aria-label="new run name"
+          />
+          <button className="primary" type="submit">
+            Create run
+          </button>
+        </form>
       </header>
 
-      <form className="card row" onSubmit={createRun}>
-        <input
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          placeholder="new run name"
-          aria-label="new run name"
-        />
-        <button type="submit">Create run</button>
-      </form>
+      {error && <p className="notice error">{error}</p>}
 
-      {error && <p className="error">{error}</p>}
-      {loading && <p className="muted">Loading…</p>}
+      <section className="panel">
+        <header className="panel-head">
+          <h2>All runs</h2>
+          <span className="muted small">{runs.length} total</span>
+        </header>
 
-      {!loading && runs.length === 0 && <p className="empty">No runs yet. Create the first one.</p>}
+        <div className="table-scroll">
+          <table className="data-table runs-table">
+            <thead>
+              <tr>
+                <th>Run</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>ID</th>
+                <th aria-label="open" />
+              </tr>
+            </thead>
+            <tbody>
+              {runs.map((run) => (
+                <tr key={run.id}>
+                  <td>
+                    <Link to={`/runs/${run.id}`} className="run-link">
+                      {run.name}
+                    </Link>
+                  </td>
+                  <td>
+                    <span className={`status ${run.status}`}>
+                      <i className="dot" />
+                      {run.status}
+                    </span>
+                  </td>
+                  <td
+                    className="mono muted"
+                    title={new Date(run.created_at).toLocaleString()}
+                  >
+                    {formatRelative(run.created_at)}
+                  </td>
+                  <td className="mono dim">{run.id.slice(0, 8)}</td>
+                  <td className="cell-action">
+                    <Link to={`/runs/${run.id}`} className="row-open">
+                      Open →
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      <ul className="run-list">
-        {runs.map((run) => (
-          <li key={run.id}>
-            <Link to={`/runs/${run.id}`} className="run-row">
-              <span className="run-name">{run.name}</span>
-              <span className="run-meta">
-                <span className={`pill ${run.status}`}>{run.status}</span>
-                <time dateTime={run.created_at}>{new Date(run.created_at).toLocaleString()}</time>
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </main>
+          {loading && <div className="empty-card">Loading…</div>}
+          {!loading && runs.length === 0 && (
+            <div className="empty-card">No runs yet. Create the first one above.</div>
+          )}
+        </div>
+      </section>
+    </Shell>
   );
 }

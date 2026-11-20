@@ -1,4 +1,4 @@
-import { createHash, randomBytes, randomUUID } from 'node:crypto';
+﻿import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { expect, test } from '@playwright/test';
 import type { Browser, Page } from '@playwright/test';
 import pg from 'pg';
@@ -62,7 +62,7 @@ async function login(page: Page, apiKey: string): Promise<void> {
   await page.goto('/login');
   await page.getByLabel('API key').fill(apiKey);
   await page.getByRole('button', { name: 'Sign in' }).click();
-  await expect(page.getByRole('heading', { name: 'Runs' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Runs', exact: true })).toBeVisible();
 }
 
 async function createRun(page: Page, name: string): Promise<string> {

@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+﻿import { randomUUID } from 'node:crypto';
 import { writeFileSync } from 'node:fs';
 import gifenc from 'gifenc';
 import { chromium } from '@playwright/test';
@@ -10,9 +10,9 @@ const { PNG } = pngjs;
 const API = process.env.API_URL ?? 'http://127.0.0.1:3000';
 const KEY = 'soup_demoa001_1f8c2b6e4a9d4f7c8b3e5a1d6f9c2b7e4a8d1f3c';
 
-const VIEWPORT = { width: 900, height: 900 };
-const CLIP = { x: 0, y: 0, width: 900, height: 860 };
-const TARGET_WIDTH = 760;
+const VIEWPORT = { width: 1280, height: 820 };
+const CLIP = { x: 0, y: 0, width: 1280, height: 790 };
+const TARGET_WIDTH = 960;
 const FRAMES = 26;
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -70,7 +70,7 @@ const page = await browser.newPage({ viewport: VIEWPORT, deviceScaleFactor: 1 })
 await page.goto(`${API}/login`);
 await page.getByLabel('API key').fill(KEY);
 await page.getByRole('button', { name: 'Sign in' }).click();
-await page.getByRole('heading', { name: 'Runs' }).waitFor();
+await page.getByRole('heading', { name: 'Runs', exact: true }).waitFor();
 
 // A fresh run keeps the chart free of earlier demo timestamps.
 const created = await page.request.post(`${API}/api/runs`, {
