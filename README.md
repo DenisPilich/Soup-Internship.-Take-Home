@@ -4,7 +4,9 @@ A small experiment tracker: projects and API keys, batched metric ingestion over
 an unreliable network, a live run page, and a run list. Postgres is the only
 source of truth; the SSE stream is a replayable tail of the event log.
 
-![Run page](docs/run-page.png)
+![Live run page](docs/live.gif)
+
+*Recorded from the running app with Playwright — `e2e/record-gif.mjs`.*
 
 ## Run
 
