@@ -134,14 +134,13 @@ queries.
 
 ## 10. What surprised me, and what still concerns me
 
-I expected the hard part to be SSE. It was the boundary between the commit and
-the delivery: once the stream became a tail of the log and the client could
-always re-read by cursor, most of the "live updates" complexity disappeared, and
-the page became a pure function of the event set. The second surprise was how
-much of idempotency is ordering — filtering duplicates before assigning `seq` is
-the difference between a cursor that means something and one that occasionally
-lies. What still concerns me is the viewer side: I proved 500 events/sec into the
-database, but not what fifty open streams do when each polls every 300 ms, and
-that is the first benchmark I would run. The slow-client path is unit-tested (the
-writer waits for `drain`), but I never filled a real socket buffer. And the E2E is
-one scenario: strong evidence, not a proof.
+Before this task I had only heard the name SSE and had never used it. What
+surprised me is that the difficult part was not the live connection itself, but
+keeping the page and the database in agreement when the connection drops or a
+batch arrives twice. The idea that made it manageable is simple: the database is
+the only source of truth, and the page just re-reads what it missed. I am still
+not fully comfortable with the viewer side. I measured 500 events per second
+going into the database, but I did not measure what happens when many pages are
+open at once, and I did not test a genuinely slow client until its socket buffer
+fills. I also know that the end-to-end test proves one scenario well, not every
+scenario. I would rather say that clearly than pretend the system is finished.
