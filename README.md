@@ -123,6 +123,7 @@ docs/           design.md, note.md, ai-usage.md, modern-web-audit.md, raw output
 
 - [Design](docs/design.md) — event model, ordering, idempotency, catch-up, isolation.
 - [Engineering note](docs/note.md) — architecture, evidence, verdict, limitations.
+- [Engineering note (PDF)](docs/note.pdf) — the two-page version for submission.
 - [AI usage](docs/ai-usage.md) — where AI helped and what was rejected.
 - [Modern web audit](docs/modern-web-audit.md) — the Chrome/Edge/Firefox/MDN
   scanner finding and the one change it produced.
