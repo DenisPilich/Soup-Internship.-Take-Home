@@ -24,7 +24,7 @@ const STATUS_LABEL: Record<StreamStatus, string> = {
   not_found: 'not found',
 };
 
-const PALETTE = ['#c15cff', '#86f5c8', '#5ef2ff', '#ff5fd2', '#ffc857'];
+const PALETTE = ['#7c3aed', '#0f9d76', '#0891b2', '#db2777', '#d97706'];
 
 export default function RunPage() {
   const { runId = '' } = useParams();

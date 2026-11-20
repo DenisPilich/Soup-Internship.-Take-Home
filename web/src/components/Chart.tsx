@@ -35,7 +35,8 @@ export default function Chart({ name, points, color }: Props) {
   );
   const last = points[points.length - 1]!;
   const levels = [minV, minV + spanV / 2, maxV];
-  const glow = { filter: `drop-shadow(0 0 4px ${color})` };
+  const glow = { filter: `drop-shadow(0 0 2px ${color}66)` };
+  const lastGlow = { filter: `drop-shadow(0 0 6px ${color}88)` };
 
   return (
     <article className="chart panel">
@@ -71,12 +72,12 @@ export default function Chart({ name, points, color }: Props) {
             cx={x(times[index]!)}
             cy={y(point.value)}
             r="2.1"
-            fill="#050308"
+            fill="#ffffff"
             stroke={color}
             strokeWidth="1.3"
           />
         ))}
-        <circle cx={x(maxT)} cy={y(last.value)} r="3.6" fill={color} style={glow} />
+        <circle cx={x(maxT)} cy={y(last.value)} r="3.6" fill={color} style={lastGlow} />
 
         <text x={PAD_LEFT} y={HEIGHT - 8} className="tick">
           {formatClock(points[0]!.ts)}
